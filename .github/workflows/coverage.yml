@@ -42,12 +42,14 @@ jobs:
         CMAKE_LIBRARY_PATH="${BASE}/build" GTEST_ROOT="${BASE}/usr" CMAKE_PREFIX_PATH="${BASE}/usr/gcc/lib64/cmake" cmake -DMSGPACK_32BIT=OFF -DBUILD_SHARED_LIBS=ON -DMSGPACK_CHAR_SIGN=signed -DMSGPACK_BUILD_EXAMPLES=ON -DMSGPACK_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Debug -DMSGPACK_GEN_COVERAGE=ON ..
         make -j4
         make test
-    - name: Upload coverage to Codecov
-      working-directory: build
+    - name: Generate coverage
       run: |
         # Create lcov report
         lcov --capture --directory . --output-file coverage.info
         lcov --remove coverage.info '/usr/*' --output-file coverage.info # filter system-files
         lcov --list coverage.info # debug info
-        # Uploading report to CodeCov
-        bash <(curl -s https://codecov.io/bash) -f coverage.info || echo "Codecov did not collect coverage reports"
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v5
+      with:
+        files: build/coverage.info
+        token: ${{ secrets.CODECOV_TOKEN }}
