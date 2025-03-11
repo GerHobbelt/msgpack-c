@@ -1688,17 +1688,17 @@ TEST(MSGPACKC, init_msgpack_obj_ext) {
     EXPECT_STREQ(buffer, obj.via.ext.ptr);
 }
 
+#define BUFFER_SIZE 4
 TEST(MSGPACKC, init_msgpack_obj_array) {
     msgpack_object obj;
     char buffer[][7] = {"test_1", "test_2", "test_3", "test_4"};
-    uint32_t buffer_size = 4;
-    msgpack_object array[buffer_size];
-    for(size_t i = 0; i < buffer_size; i++) {
+    msgpack_object array[BUFFER_SIZE];
+    for(size_t i = 0; i < BUFFER_SIZE; i++) {
         msgpack_object_init_str(&array[i], buffer[i], (uint32_t)strlen(buffer[i]));
     }
-    msgpack_object_init_array(&obj, array, buffer_size);
+    msgpack_object_init_array(&obj, array, BUFFER_SIZE);
     EXPECT_EQ(MSGPACK_OBJECT_ARRAY, obj.type);
-    for(size_t i = 0; i < buffer_size; i++) {
+    for(size_t i = 0; i < BUFFER_SIZE; i++) {
         EXPECT_STREQ(buffer[i], obj.via.array.ptr[i].via.str.ptr);
     }
 }
