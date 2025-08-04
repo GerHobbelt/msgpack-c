@@ -1,6 +1,6 @@
 #include <msgpack.h>
 
-void test()
+static void test(void)
 {
     uint64_t test_u64 = 0xFFF0000000000001LL;
     size_t size = 10000000;
@@ -28,6 +28,10 @@ void test()
     msgpack_unpacked_destroy(&msg);
     msgpack_sbuffer_destroy(&buf);
 }
+
+#if defined(BUILD_MONOLITHIC)
+#define main   msgpack_c_speed_test_uint64_array_example_main
+#endif
 
 int main(void)
 {

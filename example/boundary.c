@@ -32,7 +32,11 @@ static inline int bytesncmp(char *data, const char *bytes, size_t len)
     return 0;
 }
 
-int main()
+#if defined(BUILD_MONOLITHIC)
+#define main   msgpack_c_boundary_example_main
+#endif
+
+int main(void)
 {
     msgpack_sbuffer sbuf;
     msgpack_packer *x;
