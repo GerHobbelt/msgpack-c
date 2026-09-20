@@ -275,7 +275,7 @@ static inline int template_callback_map_item(unpack_user* u, msgpack_object* c, 
     return 0;
 }
 
-static inline int template_callback_str(unpack_user* u, const char* b, const char* p, unsigned int l, msgpack_object* o)
+static inline int template_callback_str(unpack_user* u, const char* b, const char* p, size_t l, msgpack_object* o)
 {
     MSGPACK_UNUSED(b);
     if (*u->z == NULL) {
@@ -291,7 +291,7 @@ static inline int template_callback_str(unpack_user* u, const char* b, const cha
     return 0;
 }
 
-static inline int template_callback_bin(unpack_user* u, const char* b, const char* p, unsigned int l, msgpack_object* o)
+static inline int template_callback_bin(unpack_user* u, const char* b, const char* p, size_t l, msgpack_object* o)
 {
     MSGPACK_UNUSED(b);
     if (*u->z == NULL) {
@@ -307,7 +307,7 @@ static inline int template_callback_bin(unpack_user* u, const char* b, const cha
     return 0;
 }
 
-static inline int template_callback_ext(unpack_user* u, const char* b, const char* p, unsigned int l, msgpack_object* o)
+static inline int template_callback_ext(unpack_user* u, const char* b, const char* p, size_t l, msgpack_object* o)
 {
     MSGPACK_UNUSED(b);
     if (l == 0) {
@@ -442,7 +442,11 @@ bool msgpack_unpacker_expand_buffer(msgpack_unpacker* mpac, size_t size)
 
     if(mpac->off == COUNTER_SIZE) {
         char* tmp;
-        size_t next_size = (mpac->used + mpac->free) * 2;  // include COUNTER_SIZE
+        size_t next_size;
+        if(size > SIZE_MAX - mpac->used) {
+            return false;
+        }
+        next_size = (mpac->used + mpac->free) * 2;  // include COUNTER_SIZE
         while(next_size < size + mpac->used) {
             size_t tmp_next_size = next_size * 2;
             if (tmp_next_size <= next_size) {
@@ -464,6 +468,9 @@ bool msgpack_unpacker_expand_buffer(msgpack_unpacker* mpac, size_t size)
         char* tmp;
         size_t next_size = mpac->initial_buffer_size;  // include COUNTER_SIZE
         size_t not_parsed = mpac->used - mpac->off;
+        if(size > SIZE_MAX - not_parsed - COUNTER_SIZE) {
+            return false;
+        }
         while(next_size < size + not_parsed + COUNTER_SIZE) {
             size_t tmp_next_size = next_size * 2;
             if (tmp_next_size <= next_size) {
